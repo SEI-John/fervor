@@ -1,17 +1,31 @@
-qt4_wrap_ui(SAMPLE_UI_HEADERS mainwindow.ui)
-qt4_wrap_cpp(SAMPLE_MOC_SOURCES mainwindow.h)
+cmake_minimum_required(VERSION 3.16)
+project(Sample VERSION 1.0 LANGUAGES C CXX)
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+
+find_package(QT NAMES Qt5 Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
+
+qt_standard_project_setup()
+
+qt_add_executable(Sample WIN32 MACOSX_BUNDLE
+    main.cpp
+    mainwindow.cpp mainwindow.h mainwindow.ui
+)
+target_link_libraries(Sample PRIVATE
+    Qt::Core
+    Qt::Gui
 )
 
-add_executable(FervorSample
-  main.cpp mainwindow.cpp mainwindow.ui
-  ${SAMPLE_UI_HEADERS} ${SAMPLE_MOC_SOURCES}
+install(TARGETS Sample
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-target_link_libraries( FervorSample
-  ${QT_LIBRARIES}
-  Fervor
+qt_generate_deploy_app_script(
+    TARGET Sample
+    FILENAME_VARIABLE deploy_script
+    NO_UNSUPPORTED_PLATFORM_ERROR
 )
+install(SCRIPT ${deploy_script})
